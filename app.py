@@ -4,20 +4,13 @@ from pymongo import MongoClient
 from datetime import datetime
 import matplotlib
 
-# FAST BACKEND FOR MATPLOTLIB
 matplotlib.use('Agg')
 
 import matplotlib.pyplot as plt
 import os
 
-# --------------------------------
-# FLASK APP
-# --------------------------------
 app = Flask(__name__)
 
-# --------------------------------
-# LOAD AI MODEL ONLY ONCE
-# --------------------------------
 print("Loading AI model...")
 
 sentiment_pipeline = pipeline(
@@ -27,18 +20,12 @@ sentiment_pipeline = pipeline(
 
 print("AI Model Loaded Successfully!")
 
-# --------------------------------
-# MONGODB CONNECTION
-# --------------------------------
 client = MongoClient("mongodb://localhost:27017/")
 
 db = client["sentimentDB"]
 
 collection = db["sentimentResults"]
 
-# --------------------------------
-# CREATE CHART FUNCTION
-# --------------------------------
 def create_chart():
 
     data = list(collection.find())
@@ -69,9 +56,6 @@ def create_chart():
 
     plt.close()
 
-# --------------------------------
-# HOME ROUTE
-# --------------------------------
 @app.route("/", methods=["GET", "POST"])
 def home():
 
@@ -81,9 +65,6 @@ def home():
 
         user_text = request.form["text"]
 
-        # --------------------------------
-        # FAST CUSTOM CHECK
-        # --------------------------------
         bad_words = [
             "fuck",
             "hate",
@@ -93,9 +74,6 @@ def home():
             "bad"
         ]
 
-        # --------------------------------
-        # CUSTOM NEGATIVE DETECTION
-        # --------------------------------
         if any(word in user_text.lower() for word in bad_words):
 
             label = "NEGATIVE"
@@ -110,9 +88,6 @@ def home():
 
             score = round(prediction["score"] * 100, 2)
 
-        # --------------------------------
-        # RESULT
-        # --------------------------------
         result = {
             "text": user_text,
             "label": label,
@@ -120,15 +95,10 @@ def home():
             "time": datetime.now().strftime("%d-%m-%Y %H:%M:%S")
         }
 
-        # SAVE TO DATABASE
         collection.insert_one(result)
 
-        # CREATE CHART
         create_chart()
 
-    # --------------------------------
-    # HISTORY
-    # --------------------------------
     history = list(
         collection.find().sort("_id", -1).limit(5)
     )
@@ -139,9 +109,6 @@ def home():
         history=history
     )
 
-# --------------------------------
-# RUN APP
-# --------------------------------
 if __name__ == "__main__":
 
     app.run(
