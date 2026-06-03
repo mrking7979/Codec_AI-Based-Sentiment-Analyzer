@@ -1,124 +1,115 @@
-<!DOCTYPE html>
 
-<html lang="en">
+<!DOCTYPE html>
+<html>
 
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
     <title>AI Sentiment Analyzer</title>
 
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='style.css') }}"
-    >
+    <style>
+
+        body {
+            background: #0f172a;
+            color: white;
+            font-family: Arial;
+            text-align: center;
+            padding: 40px;
+        }
+
+        textarea {
+            width: 70%;
+            height: 120px;
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 18px;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: #1e293b;
+            margin: 30px auto;
+            padding: 20px;
+            width: 70%;
+            border-radius: 15px;
+        }
+
+        img {
+            width: 300px;
+            margin-top: 20px;
+        }
+
+    </style>
 
 </head>
 
 <body>
 
-    <div class="container">
+    <h1>🤖 AI Sentiment Analyzer</h1>
 
-        <h1>
-            🤖 AI-Based Sentiment Analyzer
-        </h1>
+    <form method="POST">
 
-        <p class="subtitle">
-            Analyze comments, reviews and social media sentiments using AI
+        <textarea
+            name="text"
+            placeholder="Enter your text here..."
+            required
+        ></textarea>
+
+        <br>
+
+        <button type="submit">
+            Analyze Sentiment
+        </button>
+
+    </form>
+
+    {% if result %}
+
+    <div class="card">
+
+        <h2>Result</h2>
+
+        <h3>
+            Sentiment:
+            {{ result.label }}
+        </h3>
+
+        <h3>
+            Confidence:
+            {{ result.score }}%
+        </h3>
+
+        <p>
+            "{{ result.text }}"
         </p>
 
-        <!-- FORM -->
-        <form method="POST">
+    </div>
 
-            <textarea
-                name="text"
-                placeholder="Enter your text here..."
-                required
-            ></textarea>
+    <img src="{{ url_for('static', filename='chart.png') }}">
 
-            <button type="submit">
-                Analyze Sentiment
-            </button>
+    {% endif %}
 
-        </form>
+    <div class="card">
 
-        <!-- RESULT -->
-        {% if result %}
+        <h2>Recent History</h2>
 
-        <div class="result-card">
+        {% for item in history %}
 
-            <h2>Analysis Result</h2>
+        <p>
+            {{ item.text }}
+            →
+            <b>{{ item.label }}</b>
+        </p>
 
-            <p>
-                <strong>Text:</strong>
-                {{ result.text }}
-            </p>
-
-            <p>
-                <strong>Sentiment:</strong>
-                {{ result.label }}
-            </p>
-
-            <p>
-                <strong>Confidence Score:</strong>
-                {{ result.score }}%
-            </p>
-
-            <p>
-                <strong>Time:</strong>
-                {{ result.time }}
-            </p>
-
-        </div>
-
-        <!-- CHART -->
-        <div class="chart-card">
-
-            <h2>Sentiment Visualization</h2>
-
-            <img
-                src="{{ url_for('static', filename='chart.png') }}"
-                alt="Chart"
-            >
-
-        </div>
-
-        {% endif %}
-
-        <!-- HISTORY -->
-        <div class="history-card">
-
-            <h2>Recent Analysis History</h2>
-
-            {% for item in history %}
-
-            <div class="history-item">
-
-                <p>
-                    <strong>Text:</strong>
-                    {{ item.text }}
-                </p>
-
-                <p>
-                    <strong>Sentiment:</strong>
-                    {{ item.label }}
-                </p>
-
-                <p>
-                    <strong>Score:</strong>
-                    {{ item.score }}%
-                </p>
-
-            </div>
-
-            {% endfor %}
-
-        </div>
+        {% endfor %}
 
     </div>
 
